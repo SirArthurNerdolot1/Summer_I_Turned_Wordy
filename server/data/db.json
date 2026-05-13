@@ -1,0 +1,92 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "Ada",
+      "email": "ada@example.com",
+      "passwordHash": "$2a$10$8HPpTwmDnu0BfogU1fPTze79nK3DqZ79su/0HjrfBLz3WmfSwoXma",
+      "score": 1200,
+      "streak": 8,
+      "role": "player"
+    },
+    {
+      "id": 2,
+      "username": "Ben",
+      "email": "ben@example.com",
+      "passwordHash": "$2a$10$5MiFcsScqosZewwYgr9VPudqlGFlK99boHFoMW8waBcg/mZV0ZOpa",
+      "score": 980,
+      "streak": 5,
+      "role": "player"
+    },
+    {
+      "id": 3,
+      "username": "Cara",
+      "email": "cara@example.com",
+      "passwordHash": "$2a$10$xa6X7sHVyyzZ4Jt1kt2z1uVKQlDqQXYJAWv9FV3gunmCD.zW1clmm",
+      "score": 720,
+      "streak": 4,
+      "role": "player"
+    },
+    {
+      "id": 4,
+      "username": "Diego",
+      "email": "diego@example.com",
+      "passwordHash": "$2a$10$c18Tk643y5wg.COOMXZYi.fat6tsie9Pp54PT.AMsJc/UhJZOSP1S",
+      "score": 540,
+      "streak": 3,
+      "role": "player"
+    },
+    {
+      "id": 5,
+      "username": "Elly",
+      "email": "elly@example.com",
+      "passwordHash": "$2a$10$VWncS2BFhcOMbFJqOvDVKO2aOB.r3VCcbaw77r5uev3c0CU2mUtpy",
+      "score": 400,
+      "streak": 2,
+      "role": "player"
+    },
+    {
+      "id": 6,
+      "username": "Admin",
+      "email": "admin@lingodaily.com",
+      "passwordHash": "$2a$10$OdKRk29sU6elTCXVicBoje.q8r5Qcug7uXGDXLhXzIv20nrPrYP9e",
+      "score": 0,
+      "streak": 0,
+      "role": "admin"
+    },
+    {
+      "id": 7,
+      "username": "bloom",
+      "email": "bloom@gmail.com",
+      "passwordHash": "$2a$10$EkLA2rRo7OPbSVf5yeECjeXYWzoLMleLTNB.uoi5XG65TSSYInRLO",
+      "score": 0,
+      "streak": 0,
+      "role": "player"
+    }
+  ],
+  "dailyPuzzles": [
+    {
+      "date": "2026-05-12",
+      "pyramidTargets": [
+        "RED",
+        "READ",
+        "TREAD",
+        "THREAD"
+      ],
+      "crypticSolution": [
+        "THIS",
+        "HAVE",
+        "IVAN",
+        "SENT"
+      ],
+      "crypticClues": [
+        "The thing here sounds like hiss with a T (4)",
+        "To possess, in a simple hidden-style clue (4)",
+        "Hidden inside arrIVAN (4)",
+        "Past tense of send (4)"
+      ],
+      "hint": "Focus on anagrams, homophones, and hidden words."
+    }
+  ],
+  "nextId": 8
+}
