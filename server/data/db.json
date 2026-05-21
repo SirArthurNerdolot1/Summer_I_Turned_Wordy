@@ -7,7 +7,32 @@
       "passwordHash": "$2a$10$8HPpTwmDnu0BfogU1fPTze79nK3DqZ79su/0HjrfBLz3WmfSwoXma",
       "score": 1200,
       "streak": 8,
-      "role": "player"
+      "role": "player",
+      "globalScore": 1200,
+      "dailyScores": {
+        "2026-05-20": {
+          "gameScores": {
+            "mini-cryptic": 145,
+            "street-scrabble": 278,
+            "clear-cryptics": 95,
+            "connections-game": 150
+          },
+          "totalScore": 668,
+          "completed": true,
+          "completedAt": "2026-05-20T14:30:00Z"
+        },
+        "2026-05-19": {
+          "gameScores": {
+            "mini-cryptic": 120,
+            "street-scrabble": 250,
+            "word-pyramid": 162
+          },
+          "totalScore": 532,
+          "completed": true,
+          "completedAt": "2026-05-19T15:45:00Z"
+        }
+      },
+      "createdAt": "2024-05-15T10:30:00Z"
     },
     {
       "id": 2,
@@ -16,7 +41,20 @@
       "passwordHash": "$2a$10$5MiFcsScqosZewwYgr9VPudqlGFlK99boHFoMW8waBcg/mZV0ZOpa",
       "score": 980,
       "streak": 5,
-      "role": "player"
+      "role": "player",
+      "globalScore": 980,
+      "dailyScores": {
+        "2026-05-20": {
+          "gameScores": {
+            "mini-cryptic": 135,
+            "street-scrabble": 245
+          },
+          "totalScore": 380,
+          "completed": true,
+          "completedAt": "2026-05-20T10:20:00Z"
+        }
+      },
+      "createdAt": "2024-05-16T11:15:00Z"
     },
     {
       "id": 3,
@@ -25,7 +63,19 @@
       "passwordHash": "$2a$10$xa6X7sHVyyzZ4Jt1kt2z1uVKQlDqQXYJAWv9FV3gunmCD.zW1clmm",
       "score": 720,
       "streak": 4,
-      "role": "player"
+      "role": "player",
+      "globalScore": 720,
+      "dailyScores": {
+        "2026-05-20": {
+          "gameScores": {
+            "street-scrabble": 320
+          },
+          "totalScore": 320,
+          "completed": true,
+          "completedAt": "2026-05-20T13:10:00Z"
+        }
+      },
+      "createdAt": "2024-05-17T09:45:00Z"
     },
     {
       "id": 4,
@@ -34,7 +84,10 @@
       "passwordHash": "$2a$10$c18Tk643y5wg.COOMXZYi.fat6tsie9Pp54PT.AMsJc/UhJZOSP1S",
       "score": 540,
       "streak": 3,
-      "role": "player"
+      "role": "player",
+      "globalScore": 540,
+      "dailyScores": {},
+      "createdAt": "2024-05-18T08:20:00Z"
     },
     {
       "id": 5,
@@ -43,16 +96,22 @@
       "passwordHash": "$2a$10$VWncS2BFhcOMbFJqOvDVKO2aOB.r3VCcbaw77r5uev3c0CU2mUtpy",
       "score": 400,
       "streak": 2,
-      "role": "player"
+      "role": "player",
+      "globalScore": 400,
+      "dailyScores": {},
+      "createdAt": "2024-05-19T12:00:00Z"
     },
     {
       "id": 6,
       "username": "Admin",
       "email": "admin@lingodaily.com",
-      "passwordHash": "$2a$10$OdKRk29sU6elTCXVicBoje.q8r5Qcug7uXGDXLhXzIv20nrPrYP9e",
+      "passwordHash": "$2a$10$btnpHRxnFX5.JzcZOwzgT./lANrjR5Y3pEcPturCGNDvwErR8PWBe",
       "score": 0,
       "streak": 0,
-      "role": "admin"
+      "role": "admin",
+      "globalScore": 0,
+      "dailyScores": {},
+      "createdAt": "2024-05-01T00:00:00Z"
     },
     {
       "id": 7,
@@ -61,7 +120,46 @@
       "passwordHash": "$2a$10$EkLA2rRo7OPbSVf5yeECjeXYWzoLMleLTNB.uoi5XG65TSSYInRLO",
       "score": 0,
       "streak": 0,
-      "role": "player"
+      "role": "player",
+      "globalScore": 0,
+      "dailyScores": {},
+      "createdAt": "2024-05-20T14:30:00Z"
+    },
+    {
+      "id": 8,
+      "username": "blah",
+      "email": "blah@gmail",
+      "passwordHash": "$2a$10$5pE5FOT07WTQisJWG1g9g.nLF1fqYVt9Y1ctsDP3r9nynj1tiKWq.",
+      "score": 0,
+      "streak": 0,
+      "role": "player",
+      "globalScore": 0,
+      "dailyScores": {},
+      "createdAt": "2024-05-21T09:15:00Z"
+    },
+    {
+      "id": 9,
+      "username": "brian",
+      "email": "brain@gmail.com",
+      "passwordHash": "$2a$10$gVEUvNmvzqqs7P7m9PzAJ.W7uwtnPNX.zg4hUJLLHNk7lmjAmz.0i",
+      "score": 400,
+      "streak": 4,
+      "role": "player",
+      "globalScore": 400,
+      "dailyScores": {},
+      "createdAt": "2024-05-22T11:45:00Z"
+    },
+    {
+      "id": 10,
+      "username": "test",
+      "email": "test@gmail.com",
+      "passwordHash": "$2a$10$1mKrHFr47Tmu7/SUtr/hl.J0TLRyROjByqYq1/xnDU5pFcroxGvSG",
+      "score": 2200,
+      "streak": 3,
+      "role": "player",
+      "globalScore": 0,
+      "dailyScores": {},
+      "createdAt": "2026-05-21T05:10:44.384Z"
     }
   ],
   "dailyPuzzles": [
@@ -88,5 +186,5 @@
       "hint": "Focus on anagrams, homophones, and hidden words."
     }
   ],
-  "nextId": 8
+  "nextId": 11
 }

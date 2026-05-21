@@ -1,13 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CalendarDays, RefreshCcw, ShieldCheck, Sparkles } from "lucide-react";
+import MiniCrosswordGrid, { gridToWords, normalizeGrid } from "./MiniCrosswordGrid";
 
-const defaultForm = {
-  date: new Date().toISOString().slice(0, 10),
-  pyramidTargets: "RED, READ, TREAD, THREAD",
-  crypticSolution: "THIS, HAVE, IVAN, SENT",
-  crypticClues: "The thing here sounds like hiss with a T (4)\nTo possess, in a simple hidden-style clue (4)\nHidden inside arrIVAN (4)\nPast tense of send (4)",
-  hint: "Focus on anagrams, homophones, and hidden words.",
-};
+const defaultCrosswordGrid = [
+  ["T", "H", "I", "S"],
+  ["H", "A", "V", "E"],
+  ["I", "V", "A", "N"],
+  ["S", "E", "N", "T"],
+];
+
+const defaultAcrossClues = [
+  'Across 1: "The thing here sounds like hiss with a T" (4)',
+  'Across 2: "To possess, in a simple hidden-style clue" (4)',
+  'Across 3: "Hidden inside arrIVAN" (4)',
+  'Across 4: "Past tense of send" (4)',
+];
+
+const defaultDownClues = [
+  'Down 1: "The thing here sounds like hiss with a T" (4)',
+  'Down 2: "To possess, in a simple hidden-style clue" (4)',
+  'Down 3: "Hidden inside arrIVAN" (4)',
+  'Down 4: "Past tense of send" (4)',
+];
 
 const defaultUserForm = {
   email: "",
@@ -27,43 +41,87 @@ function StatCard({ label, value, sublabel }) {
 }
 
 export default function AdminPanel({ stats, puzzles, users, onRefresh, onSubmitPuzzle, onSubmitUser, busy = false }) {
-  const [form, setForm] = useState(defaultForm);
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [hint, setHint] = useState("Focus on anagrams, homophones, and hidden words.");
+  const [pyramidTargets, setPyramidTargets] = useState("RED, READ, TREAD, THREAD");
+  const [grid, setGrid] = useState(defaultCrosswordGrid);
+  const [acrossClues, setAcrossClues] = useState(defaultAcrossClues);
+  const [downClues, setDownClues] = useState(defaultDownClues);
+  const [activeCell, setActiveCell] = useState({ row: 0, col: 0 });
+  const [direction, setDirection] = useState("across");
   const [userForm, setUserForm] = useState(defaultUserForm);
   const [message, setMessage] = useState("");
   const [userMessage, setUserMessage] = useState("");
 
   useEffect(() => {
-    setForm((current) => ({ ...current, date: new Date().toISOString().slice(0, 10) }));
+    setDate(new Date().toISOString().slice(0, 10));
   }, []);
-
-  const update = (field, value) => {
-    setForm((current) => ({ ...current, [field]: value }));
-  };
 
   const updateUser = (field, value) => {
     setUserForm((current) => ({ ...current, [field]: value }));
   };
 
+  const normalizedGrid = useMemo(() => normalizeGrid(grid), [grid]);
+  const currentWords = useMemo(() => gridToWords(normalizedGrid), [normalizedGrid]);
+
+  const updateClue = (setter) => (index, value) => {
+    setter((current) => current.map((clue, clueIndex) => (clueIndex === index ? value : clue)));
+  };
+
   const submit = async (event) => {
     event.preventDefault();
     setMessage("");
+    const trimmedAcrossClues = acrossClues.map((clue) => String(clue).trim());
+    const trimmedDownClues = downClues.map((clue) => String(clue).trim());
+
+    if (trimmedAcrossClues.some((clue) => !clue) || trimmedDownClues.some((clue) => !clue)) {
+      setMessage("Fill all four across clues and all four down clues.");
+      return;
+    }
+
+    if (normalizedGrid.some((row) => row.some((cell) => !cell))) {
+      setMessage("Fill all 16 crossword cells before publishing.");
+      return;
+    }
+
     const payload = {
-      date: form.date,
-      pyramidTargets: form.pyramidTargets.split(",").map((item) => item.trim()).filter(Boolean),
-      crypticSolution: form.crypticSolution.split(",").map((item) => item.trim()).filter(Boolean),
-      crypticClues: form.crypticClues.split("\n").map((item) => item.trim()).filter(Boolean),
-      hint: form.hint,
+      date,
+      pyramidTargets: pyramidTargets.split(",").map((item) => item.trim()).filter(Boolean),
+      crypticSolution: currentWords.across,
+      crypticClues: trimmedAcrossClues,
+      miniCryptic: {
+        size: 4,
+        grid: normalizedGrid,
+        across: currentWords.across.map((answer, index) => ({
+          answer,
+          clue: trimmedAcrossClues[index],
+        })),
+        down: currentWords.down.map((answer, index) => ({
+          answer,
+          clue: trimmedDownClues[index],
+        })),
+      },
+      hint,
     };
-    await onSubmitPuzzle(payload);
-    setMessage("Daily puzzle saved.");
+
+    try {
+      await onSubmitPuzzle(payload);
+      setMessage("Daily puzzle saved.");
+    } catch (error) {
+      setMessage(error.message || "Failed to save puzzle.");
+    }
   };
 
   const submitUser = async (event) => {
     event.preventDefault();
     setUserMessage("");
-    await onSubmitUser(userForm);
-    setUserMessage("Admin user saved.");
-    setUserForm(defaultUserForm);
+    try {
+      await onSubmitUser(userForm);
+      setUserMessage("Admin user saved.");
+      setUserForm(defaultUserForm);
+    } catch (error) {
+      setUserMessage(error.message || "Failed to save admin user.");
+    }
   };
 
   return (
@@ -98,7 +156,7 @@ export default function AdminPanel({ stats, puzzles, users, onRefresh, onSubmitP
             <div className="font-serif text-2xl">Publish Daily Puzzle</div>
           </div>
           <p className="mt-2 text-sm text-zinc-600">
-            Enter four pyramid words and four 4-letter cryptic answer rows. Clues should be simple and ESL-friendly.
+            Fill the 4x4 crossword grid, then write four across clues and four down clues beside it.
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -106,8 +164,8 @@ export default function AdminPanel({ stats, puzzles, users, onRefresh, onSubmitP
               <span className="mb-2 block text-sm font-medium text-zinc-700">Date</span>
               <input
                 type="date"
-                value={form.date}
-                onChange={(event) => update("date", event.target.value)}
+                value={date}
+                onChange={(event) => setDate(event.target.value)}
                 className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-900"
                 required
               />
@@ -116,8 +174,8 @@ export default function AdminPanel({ stats, puzzles, users, onRefresh, onSubmitP
               <span className="mb-2 block text-sm font-medium text-zinc-700">Hint</span>
               <input
                 type="text"
-                value={form.hint}
-                onChange={(event) => update("hint", event.target.value)}
+                value={hint}
+                onChange={(event) => setHint(event.target.value)}
                 className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-900"
                 placeholder="A helpful hint for the day"
               />
@@ -127,45 +185,107 @@ export default function AdminPanel({ stats, puzzles, users, onRefresh, onSubmitP
           <label className="mt-4 block">
             <span className="mb-2 block text-sm font-medium text-zinc-700">Word Pyramid words</span>
             <input
-              value={form.pyramidTargets}
-              onChange={(event) => update("pyramidTargets", event.target.value)}
+              value={pyramidTargets}
+              onChange={(event) => setPyramidTargets(event.target.value)}
               className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-900"
               placeholder="RED, READ, TREAD, THREAD"
             />
             <span className="mt-2 block text-xs text-zinc-500">Comma-separated, exactly four words.</span>
           </label>
 
-          <label className="mt-4 block">
-            <span className="mb-2 block text-sm font-medium text-zinc-700">Cryptic answer rows</span>
-            <input
-              value={form.crypticSolution}
-              onChange={(event) => update("crypticSolution", event.target.value)}
-              className="w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-900"
-              placeholder="THIS, HAVE, IVAN, SENT"
-            />
-            <span className="mt-2 block text-xs text-zinc-500">Comma-separated, exactly four 4-letter words.</span>
-          </label>
+          <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+            <div className="space-y-4 rounded-3xl border border-zinc-200 bg-zinc-50 p-4">
+              <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-zinc-500">Grid</div>
+                <div className="mt-1 font-serif text-xl text-zinc-950">Mini crossword editor</div>
+              </div>
 
-          <label className="mt-4 block">
-            <span className="mb-2 block text-sm font-medium text-zinc-700">Cryptic clues</span>
-            <textarea
-              value={form.crypticClues}
-              onChange={(event) => update("crypticClues", event.target.value)}
-              className="min-h-40 w-full rounded-xl border border-zinc-200 px-4 py-3 outline-none focus:border-zinc-900"
-              placeholder="One clue per line"
-            />
-            <span className="mt-2 block text-xs text-zinc-500">One clue per line, exactly four lines.</span>
-          </label>
+              <MiniCrosswordGrid
+                value={grid}
+                onChange={setGrid}
+                activeCell={activeCell}
+                onActiveCellChange={setActiveCell}
+                direction={direction}
+                onDirectionChange={setDirection}
+              />
+
+              <div className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
+                <div className="font-medium text-zinc-900">Live answer preview</div>
+                <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-zinc-500">Across</div>
+                    <div className="mt-2 space-y-1 font-mono text-sm text-zinc-700">
+                      {currentWords.across.map((word, index) => (
+                        <div key={`preview-across-${index}`}>
+                          {index + 1}. {word || "____"}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs uppercase tracking-wide text-zinc-500">Down</div>
+                    <div className="mt-2 space-y-1 font-mono text-sm text-zinc-700">
+                      {currentWords.down.map((word, index) => (
+                        <div key={`preview-down-${index}`}>
+                          {index + 1}. {word || "____"}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm">
+                <div className="font-serif text-xl text-zinc-950">Across clues</div>
+                <div className="mt-4 space-y-3">
+                  {acrossClues.map((clue, index) => (
+                    <label key={`across-clue-${index}`} className="block">
+                      <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-zinc-500">
+                        Across {index + 1}
+                      </span>
+                      <input
+                        value={clue}
+                        onChange={(event) => updateClue(setAcrossClues)(index, event.target.value)}
+                        className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm outline-none focus:border-zinc-900"
+                        placeholder={`Across ${index + 1} clue`}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm">
+                <div className="font-serif text-xl text-zinc-950">Down clues</div>
+                <div className="mt-4 space-y-3">
+                  {downClues.map((clue, index) => (
+                    <label key={`down-clue-${index}`} className="block">
+                      <span className="mb-1 block text-xs font-medium uppercase tracking-wide text-zinc-500">
+                        Down {index + 1}
+                      </span>
+                      <input
+                        value={clue}
+                        onChange={(event) => updateClue(setDownClues)(index, event.target.value)}
+                        className="w-full rounded-xl border border-zinc-200 px-4 py-3 text-sm outline-none focus:border-zinc-900"
+                        placeholder={`Down ${index + 1} clue`}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
 
           {message ? <p className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</p> : null}
 
           <div className="mt-5 flex flex-wrap gap-3">
-              <button
+            <button
               type="submit"
               disabled={busy}
               className="rounded-xl bg-zinc-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {busy ? 'Saving...' : 'Save daily puzzle'}
+              {busy ? "Saving..." : "Save daily puzzle"}
             </button>
             <button
               type="button"
@@ -189,7 +309,12 @@ export default function AdminPanel({ stats, puzzles, users, onRefresh, onSubmitP
                 <div key={puzzle.date} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
                   <div className="text-sm font-medium text-zinc-900">{puzzle.date}</div>
                   <div className="mt-2 text-xs text-zinc-600">Pyramid: {Array.isArray(puzzle.pyramidTargets) ? puzzle.pyramidTargets.join(' → ') : 'n/a'}</div>
-                  <div className="mt-1 text-xs text-zinc-600">Cryptic: {Array.isArray(puzzle.crypticSolution) ? puzzle.crypticSolution.join(', ') : 'n/a'}</div>
+                  <div className="mt-1 text-xs text-zinc-600">
+                    Cryptic: {Array.isArray(puzzle.miniCryptic?.across) ? puzzle.miniCryptic.across.map((entry) => entry.answer).join(', ') : Array.isArray(puzzle.crypticSolution) ? puzzle.crypticSolution.join(', ') : 'n/a'}
+                  </div>
+                  <div className="mt-1 text-xs text-zinc-600">
+                    Clues: {Array.isArray(puzzle.miniCryptic?.across) ? `${puzzle.miniCryptic.across.length} across / ${Array.isArray(puzzle.miniCryptic?.down) ? puzzle.miniCryptic.down.length : 0} down` : Array.isArray(puzzle.crypticClues) ? `${puzzle.crypticClues.length} legacy clues` : 'n/a'}
+                  </div>
                   {puzzle.hint ? <div className="mt-1 text-xs text-sky-800">Hint: {puzzle.hint}</div> : null}
                 </div>
               ))}

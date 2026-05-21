@@ -6,3 +6,63 @@
 html, body, #root { height: 100%; }
 body { @apply bg-zinc-50 text-slate-900; }
 .font-serif { font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
+
+@layer utilities {
+	@keyframes rise-in {
+		from {
+			opacity: 0;
+			transform: translateY(16px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	@keyframes pop-in {
+		0% {
+			opacity: 0;
+			transform: scale(0.92);
+		}
+		70% {
+			opacity: 1;
+			transform: scale(1.03);
+		}
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	@keyframes soft-pulse {
+		0%,
+		100% {
+			transform: scale(1);
+			box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+		}
+		50% {
+			transform: scale(1.01);
+			box-shadow: 0 12px 30px rgba(24, 24, 27, 0.08);
+		}
+	}
+
+	.animate-rise-in {
+		animation: rise-in 520ms ease-out both;
+	}
+
+	.animate-pop-in {
+		animation: pop-in 420ms cubic-bezier(.2,.8,.2,1) both;
+	}
+
+	.animate-soft-pulse {
+		animation: soft-pulse 1.6s ease-in-out infinite;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-rise-in,
+	.animate-pop-in,
+	.animate-soft-pulse {
+		animation: none !important;
+	}
+}

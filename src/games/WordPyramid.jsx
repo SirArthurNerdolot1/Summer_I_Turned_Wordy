@@ -8,9 +8,10 @@ export default function WordPyramid({ targets, onScoreChange, onComplete, initia
   const [locked, setLocked] = useState(false);
   const [keyColors, setKeyColors] = useState({});
   const [currentInput, setCurrentInput] = useState("");
+  const [solvedFlash, setSolvedFlash] = useState(false);
 
   useEffect(() => {
-    setGuesses([]); setAttempts(0); setKeyColors({}); setCurrentInput(""); setLocked(false);
+    setGuesses([]); setAttempts(0); setKeyColors({}); setCurrentInput(""); setLocked(false); setSolvedFlash(false);
   }, [level]);
 
   useEffect(() => {
@@ -68,10 +69,14 @@ export default function WordPyramid({ targets, onScoreChange, onComplete, initia
     if (solved) {
       const remaining = Math.max(0, 5 - (attempts + 1));
       const delta = target.length * Math.max(1, remaining) * 50;
+      setSolvedFlash(true);
       onScoreChange(delta);
       addToast(`Solved ${target} — +${delta} pts`, "info");
       if (level + 1 < targets.length) {
-        setTimeout(() => setLevel((l) => l + 1), 1500);
+        setTimeout(() => {
+          setSolvedFlash(false);
+          setLevel((l) => l + 1);
+        }, 1200);
       } else {
         onComplete?.();
       }
@@ -81,10 +86,10 @@ export default function WordPyramid({ targets, onScoreChange, onComplete, initia
   }
 
   return (
-    <div>
+    <div className="animate-rise-in">
       <div className="flex flex-col items-center gap-2">
         {targets.map((t, idx) => (
-          <div key={t} className={`w-full sm:w-2/3 text-center font-serif px-3 py-2 rounded-md border ${idx < level ? "bg-emerald-50 border-emerald-300" : idx === level ? "bg-yellow-50 border-yellow-300" : "bg-white border-zinc-200"}`}>
+          <div key={t} className={`w-full sm:w-2/3 text-center font-serif px-3 py-2 rounded-md border transition-all duration-300 ${idx < level ? "bg-emerald-50 border-emerald-300 shadow-sm" : idx === level ? `bg-yellow-50 border-yellow-300 ${solvedFlash && idx === level ? 'animate-pop-in shadow-lg shadow-yellow-200' : ''}` : "bg-white border-zinc-200"}`}>
             {t.length} letters {idx < level ? "✓" : idx === level ? "(solving)" : ""}
           </div>
         ))}
@@ -93,22 +98,22 @@ export default function WordPyramid({ targets, onScoreChange, onComplete, initia
       <div className="mt-4">
         <div className="space-y-2">
           {guesses.slice(-5).map((g, i) => (
-            <div key={i} className="flex gap-1 justify-center">
+            <div key={i} className="flex gap-1 justify-center animate-pop-in" style={{ animationDelay: `${i * 60}ms` }}>
               {g.guess.split("").map((ch, j) => (
-                <div key={j} className={`w-10 h-10 flex items-center justify-center rounded-md font-medium ${g.feedback[j] === "green" ? "bg-emerald-500 text-white" : g.feedback[j] === "yellow" ? "bg-yellow-400 text-white" : "bg-zinc-200 text-zinc-800"}`}>{ch}</div>
+                <div key={j} className={`w-10 h-10 flex items-center justify-center rounded-md font-medium transition-all duration-300 ${g.feedback[j] === "green" ? "bg-emerald-500 text-white scale-100 shadow-md shadow-emerald-200" : g.feedback[j] === "yellow" ? "bg-yellow-400 text-white scale-100 shadow-md shadow-yellow-200" : "bg-zinc-200 text-zinc-800"}`}>{ch}</div>
               ))}
             </div>
           ))}
 
-          <div className="flex gap-1 justify-center mt-2">
+          <div className="flex gap-1 justify-center mt-2 animate-rise-in">
             {Array.from({ length: targets[level].length }).map((_, i) => (
-              <div key={i} className="w-10 h-10 border rounded-md flex items-center justify-center bg-white"><span className="text-lg font-medium">{currentInput[i] || ""}</span></div>
+              <div key={i} className="w-10 h-10 border rounded-md flex items-center justify-center bg-white transition-transform duration-200 hover:-translate-y-0.5"><span className="text-lg font-medium">{currentInput[i] || ""}</span></div>
             ))}
           </div>
 
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <button onClick={() => setCurrentInput((s) => s.slice(0, -1))} className="px-3 py-1 bg-white border rounded hover:bg-zinc-50">Backspace</button>
-            <button onClick={submit} disabled={locked} className="px-4 py-1 bg-zinc-900 text-white rounded disabled:opacity-50">Enter</button>
+          <div className="flex items-center justify-center gap-3 mt-3 animate-pop-in [animation-delay:180ms]">
+            <button onClick={() => setCurrentInput((s) => s.slice(0, -1))} className="px-3 py-1 bg-white border rounded transition duration-200 hover:-translate-y-0.5 hover:bg-zinc-50 active:translate-y-0">Backspace</button>
+            <button onClick={submit} disabled={locked} className="px-4 py-1 bg-zinc-900 text-white rounded transition duration-200 hover:-translate-y-0.5 hover:bg-zinc-800 disabled:opacity-50">Enter</button>
           </div>
         </div>
       </div>
